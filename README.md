@@ -2,7 +2,14 @@
 
 浙江大学 SRTP 项目，潘赟老师课题组。本仓库是手套电路部分的设计文件：一块 nRF52832 主控板和一块 NNC6121 电刺激板，两板叠装。2026 年 10 月两板版原理图与 PCB 完成，DRC 通过，待打样。
 
+Circuit design for a wearable glove that senses Parkinsonian tremor and applies transcutaneous electrical stimulation. Two stacked boards: an nRF52832 main board (4 layers) and an NNC6121 stimulation board (6 layers). Designed in EasyEDA Pro; prototype stage, not a medical device.
+
 > 这是研究原型，不构成任何医疗效果的声明。
+
+| 主控板 nRF52832，四层 | 刺激板 NNC6121，六层 |
+|---|---|
+| ![主控板正面](hardware/images/主控板_正面.png) | ![刺激板正面](hardware/images/刺激板_正面.png) |
+| ![主控板背面](hardware/images/主控板_背面.png) | ![刺激板背面](hardware/images/刺激板_背面.png) |
 
 ## 两块板
 
@@ -32,18 +39,29 @@
 
 其余页面的图片在 `hardware/images/`。
 
-## PCB
+## PCB 布线
 
-刺激板全板，顶层与底层：
+刺激板六层逐层渲染。线为走线，按网络类别着色，暗色填充为铺铜，白圈为过孔，每张图下方有图例；所有层均从顶面透视，未镜像。
 
-![刺激板顶层](hardware/images/刺激板_1_顶层全板.png)
-![刺激板底层](hardware/images/刺激板_1_底层全板.png)
+| 顶层 | 内层 1，GND |
+|---|---|
+| ![顶层](hardware/images/刺激板_层_1_顶层.png) | ![内层1](hardware/images/刺激板_层_2_内层1_GND.png) |
+
+| 内层 2，SIG1 | 内层 3，SIG2 |
+|---|---|
+| ![内层2](hardware/images/刺激板_层_3_内层2_SIG1.png) | ![内层3](hardware/images/刺激板_层_4_内层3_SIG2.png) |
+
+| 内层 4，GND2 | 底层 |
+|---|---|
+| ![内层4](hardware/images/刺激板_层_5_内层4_GND2.png) | ![底层](hardware/images/刺激板_层_6_底层.png) |
+
+看图要点：两个 GND 内层按高压地、数字地、模拟地分割，高压地包住左侧 H9 输出和升压区，数字地包住 NNC6121 的数字侧，两者只在一点汇流；高压网络（红）全部走在左侧和顶层，不穿过数字区；SIG1、SIG2 承担跨区的 SPI、按键和脱落检测信号。
 
 与主控板叠装对照（主控板顶层轮廓叠加在刺激板上，用于核对连接器、按键和高压引脚的相对位置）：
 
 ![叠板对照](hardware/images/刺激板_1_叠板对照.png)
 
-局部：升压区、NNC6121 周围、低压电源、高压输出，见 `hardware/images/`。
+局部放大：升压区、NNC6121 周围、低压电源、高压输出，见 `hardware/images/` 中以 `刺激板_2_`、`刺激板_3_` 开头的文件。
 
 ## 设计流程
 
@@ -59,7 +77,7 @@ hardware/
   原理图_主控板.pdf、原理图_刺激板.pdf
   主控板_交互式BOM.html           主控板交互式 BOM
   主控板丝印方案.html
-  images/                         原理图各页图片与刺激板各层渲染
+  images/                         两板 3D 渲染、原理图各页图片、刺激板各层渲染
 docs/
   主控引脚.md                     nRF52832 引脚分配
   电刺激引脚.md                   NNC6121 引脚分配
