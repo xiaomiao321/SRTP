@@ -1,96 +1,96 @@
-# 震颤评估与干预手套：电路设计
+# Tremor Assessment and Intervention Glove: Circuit Design
 
-浙江大学 SRTP 项目，潘赟老师课题组。本仓库是手套电路部分的设计文件：一块 nRF52832 主控板和一块 NNC6121 电刺激板，两板叠装。2026 年 10 月两板版原理图与 PCB 完成，DRC 通过，待打样。
+English | [中文](README_CN.md)
 
-Circuit design for a wearable glove that senses Parkinsonian tremor and applies transcutaneous electrical stimulation. Two stacked boards: an nRF52832 main board (4 layers) and an NNC6121 stimulation board (6 layers). Designed in EasyEDA Pro; prototype stage, not a medical device.
+Zhejiang University SRTP undergraduate research project in Prof. Yun Pan's lab. This repository holds the circuit design of a wearable glove that senses Parkinsonian tremor and applies transcutaneous electrical stimulation: an nRF52832 main board and an NNC6121 stimulation board, stacked. I am the sole designer of both boards. Schematics and PCBs were completed in October 2026 and pass DRC; both boards were fabricated in November 2026 and have not yet been powered up.
 
-> 这是研究原型，不构成任何医疗效果的声明。
+> This is a research prototype. Nothing here is a claim of any medical effect.
 
-| 主控板 nRF52832，四层 | 刺激板 NNC6121，六层 |
+| Main board, nRF52832, 4 layers | Stimulation board, NNC6121, 6 layers |
 |---|---|
-| ![主控板正面](hardware/images/主控板_正面.png) | ![刺激板正面](hardware/images/刺激板_正面.png) |
-| ![主控板背面](hardware/images/主控板_背面.png) | ![刺激板背面](hardware/images/刺激板_背面.png) |
+| ![Main board, front](hardware/images/主控板_正面.png) | ![Stimulation board, front](hardware/images/刺激板_正面.png) |
+| ![Main board, back](hardware/images/主控板_背面.png) | ![Stimulation board, back](hardware/images/刺激板_背面.png) |
 
-## 两块板
+## The two boards
 
-| 板 | 主芯片 | 层数 | 主要内容 |
+| Board | Main chip | Layers | Contents |
 |---|---|---|---|
-| 主控板 | nRF52832，BLE | 4 | 8 路 I2C 传感器接口：5 个手指接口和腕部 IMU、磁传感器；RGB 状态灯；USB 充电（MCP73831）与电池电压检测；传感器分组供电开关；2.4G 天线匹配网络；SWD 与串口测试点 |
-| 刺激板 | NNC6121 | 6 | 片内升压至 HVDD（≤55V）的双通道经皮电刺激输出；光耦电极脱落检测；光 MOS 通道开关；开始/暂停与急停按键；通道指示灯；1.8V LDO；SWD 与串口测试点 |
-| 板间连接 | J1 / J2 | 叠装 | SPI、NNC_INT、NNC_NRST、STIM_EN_N 与电源 |
+| Main board | nRF52832, BLE | 4 | 8 I2C sensor ports: 5 finger ports plus wrist IMU and magnetometer; RGB status LED; USB charging with MCP73831 and battery voltage sensing; switched power per sensor group; 2.4 GHz antenna matching network; SWD and UART test points |
+| Stimulation board | NNC6121 | 6 | Two-channel transcutaneous stimulation output with on-chip boost to HVDD, up to 55 V; optocoupler electrode-off detection; photo-MOS channel switches; start/pause and e-stop keys; channel indicators; 1.8 V LDO; SWD and UART test points |
+| Board-to-board | J1 / J2 | stacked | SPI, NNC_INT, NNC_NRST, STIM_EN_N and power |
 
-刺激板叠层：顶层 / GND / SIG1 / SIG2 / GND2 / 底层。高压网络（HVDD、BOOST_OUT、STIMU0–3）单独设 0.6mm 间距规则；数字地、模拟地、高压地分割，在单点汇流；升压区与高压输出区和低压数字区分开布置。
+Stimulation board stack-up: top / GND / SIG1 / SIG2 / GND2 / bottom. The high-voltage nets HVDD, BOOST_OUT and STIMU0 to STIMU3 have their own 0.6 mm clearance rule; digital, analog and high-voltage grounds are split and joined at a single point; the boost area is placed apart from both the high-voltage output area and the low-voltage digital area.
 
-## 原理图
+## Schematics
 
-完整 PDF：[主控板](hardware/原理图_主控板.pdf)（电源、nRF52832 核心、传感器与接口，3 页）、[刺激板](hardware/原理图_刺激板.pdf)（NNC6121 核心、刺激输出，2 页）。
+Full PDFs: [main board](hardware/原理图_主控板.pdf) (power, nRF52832 core, sensors and connectors, 3 pages) and [stimulation board](hardware/原理图_刺激板.pdf) (NNC6121 core and stimulation output, 2 pages).
 
-刺激板 NNC6121 核心页：芯片、晶振、板间接口、地分割、按键、1V8 LDO 和输出使能。
+Stimulation board, NNC6121 core page: chip, crystal, board-to-board connector, ground split, keys, 1.8 V LDO and output enable.
 
-![刺激板 NNC6121 核心](hardware/images/原理图_刺激板_1_NNC6121核心.png)
+![Stimulation board, NNC6121 core](hardware/images/原理图_刺激板_1_NNC6121核心.png)
 
-刺激板输出页：升压、HVDD 控制、ESD、电极脱落检测、脱落时切断输出、电极接口。
+Stimulation board, output page: boost, HVDD control, ESD, electrode-off detection, output cut-off on electrode-off, electrode connector.
 
-![刺激板输出](hardware/images/原理图_刺激板_2_刺激输出.png)
+![Stimulation board, output](hardware/images/原理图_刺激板_2_刺激输出.png)
 
-主控板传感器与接口页：腕部磁力计与 IMU、板间接口、5 个手指接口。
+Main board, sensors and connectors page: wrist magnetometer and IMU, board-to-board connector, 5 finger ports.
 
-![主控板传感器与接口](hardware/images/原理图_主控板_3_传感器与接口.png)
+![Main board, sensors and connectors](hardware/images/原理图_主控板_3_传感器与接口.png)
 
-其余页面的图片在 `hardware/images/`。
+Images of the other pages are in `hardware/images/`.
 
-## PCB 布线
+## PCB layout
 
-刺激板六层逐层渲染。线为走线，按网络类别着色，暗色填充为铺铜，白圈为过孔，每张图下方有图例；所有层均从顶面透视，未镜像。
+Layer-by-layer renders of the 6-layer stimulation board. Lines are traces colored by net class, dark fills are copper pours, white circles are vias; each image has a legend. All layers are viewed from the top, not mirrored.
 
-| 顶层 | 内层 1，GND |
+| Top | Inner 1, GND |
 |---|---|
-| ![顶层](hardware/images/刺激板_层_1_顶层.png) | ![内层1](hardware/images/刺激板_层_2_内层1_GND.png) |
+| ![Top](hardware/images/刺激板_层_1_顶层.png) | ![Inner 1](hardware/images/刺激板_层_2_内层1_GND.png) |
 
-| 内层 2，SIG1 | 内层 3，SIG2 |
+| Inner 2, SIG1 | Inner 3, SIG2 |
 |---|---|
-| ![内层2](hardware/images/刺激板_层_3_内层2_SIG1.png) | ![内层3](hardware/images/刺激板_层_4_内层3_SIG2.png) |
+| ![Inner 2](hardware/images/刺激板_层_3_内层2_SIG1.png) | ![Inner 3](hardware/images/刺激板_层_4_内层3_SIG2.png) |
 
-| 内层 4，GND2 | 底层 |
+| Inner 4, GND2 | Bottom |
 |---|---|
-| ![内层4](hardware/images/刺激板_层_5_内层4_GND2.png) | ![底层](hardware/images/刺激板_层_6_底层.png) |
+| ![Inner 4](hardware/images/刺激板_层_5_内层4_GND2.png) | ![Bottom](hardware/images/刺激板_层_6_底层.png) |
 
-看图要点：两个 GND 内层按高压地、数字地、模拟地分割，高压地包住左侧 H9 输出和升压区，数字地包住 NNC6121 的数字侧，两者只在一点汇流；高压网络（红）全部走在左侧和顶层，不穿过数字区；SIG1、SIG2 承担跨区的 SPI、按键和脱落检测信号。
+What to look for: both GND layers are split into high-voltage, digital and analog grounds; the high-voltage ground covers the H9 output and boost area on the left, the digital ground covers the digital side of the NNC6121, and the two meet at a single point. All high-voltage nets, in red, stay on the left side and the top layer and never cross the digital area. SIG1 and SIG2 carry the SPI, key and electrode-off signals between areas.
 
-与主控板叠装对照（主控板顶层轮廓叠加在刺激板上，用于核对连接器、按键和高压引脚的相对位置）：
+Stack check: the main board top-layer outline overlaid on the stimulation board, used to check the relative positions of connectors, keys and high-voltage pins.
 
-![叠板对照](hardware/images/刺激板_1_叠板对照.png)
+![Stack check](hardware/images/刺激板_1_叠板对照.png)
 
-局部放大：升压区、NNC6121 周围、低压电源、高压输出，见 `hardware/images/` 中以 `刺激板_2_`、`刺激板_3_` 开头的文件。
+Close-ups of the boost area, the NNC6121 surroundings, the low-voltage supplies and the high-voltage output are the files starting with `刺激板_2_` and `刺激板_3_` in `hardware/images/`.
 
-## 设计流程
+## Design process
 
-- 工具：嘉立创EDA 专业版（EasyEDA Pro）。
-- AI 辅助：通过嘉立创EDA 的脚本接口导出图元，用 Python 脚本做高压规则感知的布线、铺铜连通性检查和器件放置检查；叠层、设计规则、器件选型、原理图修改、最终 DRC 和人工复核由本人完成。
-- 文档：引脚表、灯光与按键逻辑、刺激板测试方案见 `docs/`。
+- Tool: EasyEDA Pro.
+- AI-assisted scripting: primitives exported through the EasyEDA scripting API, then Python scripts for high-voltage-rule-aware routing, copper connectivity checks and placement checks. Stack-up, design rules, part selection, schematic changes, final DRC and manual review are my own.
+- Documentation: pin tables, indicator and key logic, and the stimulation board test plan are in `docs/`.
 
-## 目录
+## Folders
 
 ```
 hardware/
-  电刺激_两块板_2026-10-19.epro   嘉立创EDA 工程，含主控板与刺激板
-  原理图_主控板.pdf、原理图_刺激板.pdf
-  主控板_交互式BOM.html           主控板交互式 BOM
-  主控板丝印方案.html
-  images/                         两板 3D 渲染、原理图各页图片、刺激板各层渲染
+  电刺激_两块板_2026-10-19.epro   EasyEDA project with both boards
+  原理图_主控板.pdf, 原理图_刺激板.pdf   schematics
+  主控板_交互式BOM.html, 刺激板_交互式BOM.html   interactive BOMs
+  images/                         3D renders, schematic pages, stimulation board layer renders
 docs/
-  主控引脚.md                     nRF52832 引脚分配
-  电刺激引脚.md                   NNC6121 引脚分配
-  灯光逻辑与引脚配置.md           指示灯、按键与状态定义
-  测试/                           NNC6121 模组性能验证方案与负载断开测试记录
+  主控引脚.md                     nRF52832 pin assignment
+  电刺激引脚.md                   NNC6121 pin assignment
+  灯光逻辑与引脚配置.md           indicators, keys and state definitions
+  测试/                           NNC6121 module verification plan and load-disconnect test record
 history/
-  2026-05_单板版/                 第一版，电刺激与主控在一块板上
-  课题组早期参考设计/             课题组此前的刺激模块、手指板与手腕板，非本人设计
+  2026-05_单板版/                 first version, stimulation and control on one board
+  课题组早期参考设计/             earlier stimulation, finger and wrist boards from the lab, not my design
 ```
 
-nRF52832 与 NNC6121 的数据手册不随仓库分发，请向 Nordic 和厂商获取。
+The nRF52832 and NNC6121 datasheets are not redistributed here; get them from Nordic and the chip vendor.
 
-## 版本
+## History
 
-- 2026-05：单板版，电刺激与主控同板。
-- 2026-10：两板版，主控板 4 层，刺激板 6 层，叠装；原理图与 PCB 完成，待打样。
+- 2026-05: single-board version, stimulation and control on one board.
+- 2026-10: two-board version, 4-layer main board and 6-layer stimulation board, stacked; schematics and PCBs complete.
+- 2026-11: both boards of the two-board version fabricated, not yet powered up.
